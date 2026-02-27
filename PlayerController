@@ -1,0 +1,20 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    [SerializeField] private string playerName = "Warrior";
+    [SerializeField] private float moveSpeed = 5.0f;
+    [SerializeField] private float health = 100f;
+
+    void Start()
+    {
+        Debug.Log(playerName + " oyuna giriş yaptı!");
+    }
+
+    void Update()
+    {
+        // Objemizi her karede ileri (Z ekseni) doğru hareket ettirelim
+        // Vector3.forward = (0, 0, 1) demektir.
+        transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+    }
+}
