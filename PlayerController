@@ -2,40 +2,43 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5.0f;
-    [SerializeField] private float health = 100f;
+    [SerializeField] private float moveSpeed = 7.0f;
     [SerializeField] private float jumpForce = 5.0f;
-    private Rigidbody rb; // Fizik motoruna erişim için değişken
-    public bool isGrounded; // Yerde miyiz?
+    
+    private Rigidbody rb;
+    private bool isGrounded;
 
     void Start()
     {
-        // Kod başladığında objenin üzerindeki Rigidbody'yi bul ve bağla
         rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        // İleri Hareket (Sürekli)
-        transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        // 1. Girişleri Al (Eksen Sistemi)
+        float horizontalInput = Input.GetAxis("Horizontal"); // A/D veya Sağ/Sol
+        float verticalInput = Input.GetAxis("Vertical");     // W/S veya Yukarı/Aşağı
 
-        // Zıplama Şartı: Boşluğa basılsın VE yerde olalım
+        // 2. Hareket Yönünü Hesapla
+        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput);
+
+        // 3. Objeyi Hareket Ettir
+        // transform.Translate yerine daha akıcı bir yöntem:
+        transform.Translate(movement * moveSpeed * Time.deltaTime);
+
+        // Zıplama (Dünkü kodumuz)
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            // Fiziksel bir itme kuvveti uygula
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false; // Havaya kalktığı an artık yerde değil
+            isGrounded = false;
         }
     }
 
-    // Unity'nin çarpışma algılama fonksiyonu
     private void OnCollisionEnter(Collision collision)
     {
-        // Eğer çarptığımız objenin adı "Floor" ise (veya etiketi)
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
-            Debug.Log("Yere indik!");
         }
     }
 }
