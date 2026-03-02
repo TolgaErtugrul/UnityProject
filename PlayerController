@@ -2,19 +2,25 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private string playerName = "Warrior";
     [SerializeField] private float moveSpeed = 5.0f;
     [SerializeField] private float health = 100f;
 
-    void Start()
-    {
-        Debug.Log(playerName + " oyuna giriş yaptı!");
-    }
-
     void Update()
     {
-        // Objemizi her karede ileri (Z ekseni) doğru hareket ettirelim
-        // Vector3.forward = (0, 0, 1) demektir.
+        // 1. İleri Hareket (Sürekli)
         transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+
+        // 2. Zıplama Kontrolü (Sadece Boşluk tuşuna basıldığında)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+        }
+    }
+
+    void Jump()
+    {
+        // Objemizi yukarı doğru (Y ekseni) anlık olarak hareket ettirelim
+        transform.Translate(Vector3.up * jumpForce);
+        Debug.Log("Zıplama gerçekleşti!");
     }
 }
