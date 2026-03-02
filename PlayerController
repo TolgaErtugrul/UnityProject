@@ -4,23 +4,38 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5.0f;
     [SerializeField] private float health = 100f;
+    [SerializeField] private float jumpForce = 5.0f;
+    private Rigidbody rb; // Fizik motoruna erişim için değişken
+    public bool isGrounded; // Yerde miyiz?
+
+    void Start()
+    {
+        // Kod başladığında objenin üzerindeki Rigidbody'yi bul ve bağla
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
-        // 1. İleri Hareket (Sürekli)
+        // İleri Hareket (Sürekli)
         transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
 
-        // 2. Zıplama Kontrolü (Sadece Boşluk tuşuna basıldığında)
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Zıplama Şartı: Boşluğa basılsın VE yerde olalım
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            Jump();
+            // Fiziksel bir itme kuvveti uygula
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false; // Havaya kalktığı an artık yerde değil
         }
     }
 
-    void Jump()
+    // Unity'nin çarpışma algılama fonksiyonu
+    private void OnCollisionEnter(Collision collision)
     {
-        // Objemizi yukarı doğru (Y ekseni) anlık olarak hareket ettirelim
-        transform.Translate(Vector3.up * jumpForce);
-        Debug.Log("Zıplama gerçekleşti!");
+        // Eğer çarptığımız objenin adı "Floor" ise (veya etiketi)
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+            Debug.Log("Yere indik!");
+        }
     }
 }
