@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 7.0f;
     [SerializeField] private float jumpForce = 5.0f;
+    [SerializeField] private int score = 0; // Puanımızı tutacak değişken
     
     private Rigidbody rb;
     private bool isGrounded;
@@ -39,6 +40,20 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+    }
+
+    // Tetikleyici bir alana girildiğinde çalışır
+    private void OnTriggerEnter(Collider other)
+    {
+        // Eğer çarptığımız objenin etiketi "Coin" ise
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            score++; // Puanı 1 artır
+            Debug.Log("Altın toplandı! Toplam Puan: " + score);
+
+            // Altın objesini sahneden yok et (Sihirbazlık!)
+            Destroy(other.gameObject);
         }
     }
 }
