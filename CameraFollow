@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class CameraFollow : MonoBehaviour
+{
+    [SerializeField] private Transform playerTransform; // Takip edilecek karakter
+    private Vector3 offset; // Kamera ile karakter arasındaki sabit mesafe
+
+    void Start()
+    {
+        // Oyun başladığında aradaki mevcut mesafeyi hesapla ve kaydet
+        offset = transform.position - playerTransform.position;
+    }
+
+    // LateUpdate, tüm hareketler bittikten sonra çalışır. 
+    // Kamera takibi için en profesyonel yer burasıdır!
+    void LateUpdate()
+    {
+        // Kameranın yeni pozisyonu = Karakterin anlık yeri + baştaki mesafe
+        transform.position = playerTransform.position + offset;
+    }
+}
