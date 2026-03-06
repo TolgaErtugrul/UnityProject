@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -7,9 +8,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int score = 0; // Puanımızı tutacak değişken
     [SerializeField] private TextMeshProUGUI scoreText; // 2. Ekranda görünecek yazı objesi
     [SerializeField] private int health = 3; // Başlangıç canı
+    [SerializeField] private TextMeshProUGUI healthText; // Can yazısı
+    [SerializeField] private Image damageImage; // Kırmızı ekran resmi
+    [SerializeField] private float flashSpeed = 5f; // Efektin kaybolma hızı
+    [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.3f);
     
     private Rigidbody rb;
     private bool isGrounded;
+    private bool isDamaged = false;
 
     private void Start()
     {
@@ -59,6 +65,17 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
+
+        // Hasar alındıysa ekranı kırmızı yap, sonra yavaşça şeffaf hale getir
+        if (isDamaged)
+        {
+            damageImage.color = flashColor;
+        }
+        else
+        {
+            damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
+        }
+        isDamaged = false; // Her karede sıfırla
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -70,20 +87,23 @@ public class PlayerController : MonoBehaviour
     }
 
     private void TakeDamage()
-{
-    health--; // Canı 1 azalt
-    Debug.Log("Can Gitti! Kalan Can: " + health);
-
-    if (health <= 0)
     {
-        GameOver();
+        isDamaged = true; // Efekti tetikle
+            health--;
+            UpdateUI();
+    
+            if (health <= 0) GameOver();
     }
-}
 
-private void GameOver()
-{
-    Debug.Log("Oyun Bitti!");
-    // Şimdilik oyunu durduralım, ileride "Yeniden Başlat" butonu ekleriz.
-    Time.timeScale = 0f; 
-}
+    private void GameOver()
+    {
+        Debug.Log("Oyun Bitti!");
+        // Şimdilik oyunu durduralım, ileride "Yeniden Başlat" butonu ekleriz.
+        Time.timeScale = 0f; 
+    }
+
+    void UpdateUI()
+    {
+        healthText.text = "Can: " + health.ToString();
+    }
 }
