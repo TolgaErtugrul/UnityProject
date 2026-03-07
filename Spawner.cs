@@ -22,4 +22,15 @@ public class Spawner : MonoBehaviour
         // Obje üretme komutu: Instantiate(ne, nerede, hangi açıyla)
         Instantiate(coinPrefab, spawnPos, Quaternion.identity);
     }
+
+    public void IncreaseDifficulty(float amount)
+    {
+        // Spawn aralığını düşürerek objelerin daha sık gelmesini sağlarız
+        spawnInterval -= amount;
+        if (spawnInterval < 0.5f) spawnInterval = 0.5f; // Çok imkansız olmasın diye sınır koyduk
+        
+        // Eski döngüyü durdurup yeni hızla başlatalım
+        CancelInvoke("SpawnCoin");
+        InvokeRepeating("SpawnCoin", spawnInterval, spawnInterval);
+    }
 }
