@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Image damageImage; // Kırmızı ekran resmi
     [SerializeField] private float flashSpeed = 5f; // Efektin kaybolma hızı
     [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.3f);
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private Spawner spawner; // Spawner'a erişim
     
     private Rigidbody rb;
     private bool isGrounded;
@@ -42,8 +45,13 @@ public class PlayerController : MonoBehaviour
 
     void UpdateScoreUI()
     {
-        // Puanı ekrandaki yazıya aktar
-        scoreText.text = "Puan: " + score.ToString();
+        scoreText.text = "Puan: " + score;
+        
+        // Profesyonel Dokunuş: Her 5 puanda bir zorluğu artır
+        if (score > 0 && score % 5 == 0)
+        {
+            spawner.IncreaseDifficulty(0.2f);
+        }
     }
 
     void Update()
@@ -97,13 +105,19 @@ public class PlayerController : MonoBehaviour
 
     private void GameOver()
     {
-        Debug.Log("Oyun Bitti!");
-        // Şimdilik oyunu durduralım, ileride "Yeniden Başlat" butonu ekleriz.
-        Time.timeScale = 0f; 
+        gameOverPanel.SetActive(true); // Paneli göster
+        Time.timeScale = 0f; // Zamanı durdur
     }
 
     void UpdateUI()
     {
         healthText.text = "Can: " + health.ToString();
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; // Zamanı geri akıt
+        // Mevcut sahneyi yeniden yükle
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
