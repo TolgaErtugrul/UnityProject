@@ -15,14 +15,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.3f);
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private Spawner spawner; // Spawner'a erişim
+
+    [Header("Ses Efektleri")]
+    [SerializeField] private AudioClip coinSound;
+    [SerializeField] private AudioClip damageSound;
     
     private Rigidbody rb;
     private bool isGrounded;
     private bool isDamaged = false;
+    private AudioSource audioSource;
 
     private void Start()
     {
         UpdateScoreUI();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -32,6 +38,7 @@ public class PlayerController : MonoBehaviour
         {
             score++;
             UpdateScoreUI();
+            audioSource.PlayOneShot(coinSound); // Altın alınca
             Destroy(other.gameObject);
         }
         
@@ -39,6 +46,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Obstacle"))
         {
             TakeDamage();
+            audioSource.PlayOneShot(damageSound); // Hasar alınca
             Destroy(other.gameObject); // Bize çarpan engeli yok edelim
         }
     }
