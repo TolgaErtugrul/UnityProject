@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int score = 0; // Puanımızı tutacak değişken
     [SerializeField] private TextMeshProUGUI scoreText; // 2. Ekranda görünecek yazı objesi
     [SerializeField] private int health = 3; // Başlangıç canı
+    [SerializeField] private float jumpForce = 5f;
     [SerializeField] private TextMeshProUGUI healthText; // Can yazısı
     [SerializeField] private Image damageImage; // Kırmızı ekran resmi
     [SerializeField] private float flashSpeed = 5f; // Efektin kaybolma hızı
@@ -24,11 +25,60 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private bool isDamaged = false;
     private AudioSource audioSource;
+    private Animator anim;
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         UpdateScoreUI();
+        UpdateUI();
         audioSource = GetComponent<AudioSource>();
+        anim = GetComponentInChildren<Animator>();
+    }
+
+    void Update()
+    {
+        // 1. Girişleri Al
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+        // 2. Hareket ve Animasyon
+        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput);
+        transform.Translate(movement * moveSpeed * Time.deltaTime);
+
+        // --- ANIMASYON KONTROLÜ BURADA ---
+        // Eğer yatayda veya dikeyde bir giriş varsa (0 değilse) karakter hareket ediyordur.
+        bool moving = (horizontalInput != 0 || verticalInput != 0);
+        
+        if (anim != null) // Animator'ın takılı olduğundan emin olalım (Hata almamak için)
+        {
+            anim.SetBool("isMoving", moving);
+        }
+        // ---------------------------------
+
+        // Zıplama
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false;
+            // Eğer zıplama animasyonun varsa buraya: anim.SetTrigger("Jump");
+        }
+
+        // Hasar Efekti (Senin kodun aynen devam ediyor...)
+        HandleFlashEffect();
+    }
+
+    void HandleFlashEffect()
+    {
+        if (isDamaged)
+        {
+            damageImage.color = flashColor;
+            isDamaged = false;
+        }
+        else
+        {
+            damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -60,38 +110,6 @@ public class PlayerController : MonoBehaviour
         {
             spawner.IncreaseDifficulty(0.2f);
         }
-    }
-
-    void Update()
-    {
-        // 1. Girişleri Al (Eksen Sistemi)
-        float horizontalInput = Input.GetAxis("Horizontal"); // A/D veya Sağ/Sol
-        float verticalInput = Input.GetAxis("Vertical");     // W/S veya Yukarı/Aşağı
-
-        // 2. Hareket Yönünü Hesapla
-        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput);
-
-        // 3. Objeyi Hareket Ettir
-        // transform.Translate yerine daha akıcı bir yöntem:
-        transform.Translate(movement * moveSpeed * Time.deltaTime);
-
-        // Zıplama (Dünkü kodumuz)
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
-        }
-
-        // Hasar alındıysa ekranı kırmızı yap, sonra yavaşça şeffaf hale getir
-        if (isDamaged)
-        {
-            damageImage.color = flashColor;
-        }
-        else
-        {
-            damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
-        }
-        isDamaged = false; // Her karede sıfırla
     }
 
     private void OnCollisionEnter(Collision collision)
