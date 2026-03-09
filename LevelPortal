@@ -1,0 +1,16 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class LevelPortal : MonoBehaviour
+{
+    [SerializeField] private string nextSceneName; // Geçeceğimiz sahnenin adı
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // Sonraki sahneyi yükle
+            SceneManager.LoadScene(nextSceneName);
+        }
+    }
+}
