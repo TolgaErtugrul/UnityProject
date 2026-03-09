@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.3f);
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private Spawner spawner; // Spawner'a erişim
+    [SerializeField] private GameObject coinEffectPrefab; // Parçacık prefabı
 
     [Header("Ses Efektleri")]
     [SerializeField] private AudioClip coinSound;
@@ -88,8 +89,19 @@ public class PlayerController : MonoBehaviour
         {
             score++;
             UpdateScoreUI();
-            audioSource.PlayOneShot(coinSound); // Altın alınca
+            audioSource.PlayOneShot(coinSound);
+            
+            // EFEKTİ OLUŞTUR
+            Instantiate(coinEffectPrefab, other.transform.position, Quaternion.identity);
+            
             Destroy(other.gameObject);
+    
+            // Profesyonel Dokunuş: 15 puana ulaşınca Portalı aktif et
+            if (score >= 15) 
+            {
+                GameObject.Find("Portal").GetComponent<MeshRenderer>().enabled = true;
+                GameObject.Find("Portal").GetComponent<Collider>().enabled = true;
+            }
         }
         
         // Engele Çarpma
