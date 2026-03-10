@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     [Header("Ses Efektleri")]
     [SerializeField] private AudioClip coinSound;
     [SerializeField] private AudioClip damageSound;
+
+    [Header("Ateş Etme")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint; // Merminin çıkacağı nokta (karakterin önü)
     
     private Rigidbody rb;
     private bool isGrounded;
@@ -65,8 +69,13 @@ public class PlayerController : MonoBehaviour
             // Eğer zıplama animasyonun varsa buraya: anim.SetTrigger("Jump");
         }
 
-        // Hasar Efekti (Senin kodun aynen devam ediyor...)
+        // Hasar Efekti
         HandleFlashEffect();
+
+        if (Input.GetButtonDown("Fire1")) // Sol mouse tıkı veya sol CTRL
+        {
+            Shoot();
+        }
     }
 
     void HandleFlashEffect()
@@ -157,5 +166,10 @@ public class PlayerController : MonoBehaviour
         Time.timeScale = 1f; // Zamanı geri akıt
         // Mevcut sahneyi yeniden yükle
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 }
