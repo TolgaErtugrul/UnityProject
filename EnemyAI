@@ -1,0 +1,35 @@
+using UnityEngine;
+
+public class EnemyAI : MonoBehaviour
+{
+    private Transform playerTransform;
+    [SerializeField] private float enemySpeed = 3.0f;
+
+    void Start()
+    {
+        // Sahnede "Player" tagına sahip objeyi bul
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
+    void Update()
+    {
+        if (playerTransform != null)
+        {
+            // 1. Oyuncuya doğru dön
+            transform.LookAt(playerTransform);
+
+            // 2. Oyuncuya doğru ilerle
+            // Vector3.MoveTowards: Mevcut yerden hedef yere, belirli hızda gitmeyi sağlar
+            transform.position = Vector3.MoveTowards(transform.position, playerTransform.position, enemySpeed * Time.deltaTime);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Mermiyle vurulursa yok ol (Daha önce yazdığımız Bullet scripti ile uyumlu)
+        if (other.CompareTag("Bullet"))
+        {
+            Destroy(gameObject);
+        }
+    }
+}
