@@ -122,14 +122,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void UpdateScoreUI()
+    private void UpdateScoreUI()
     {
         scoreText.text = "Puan: " + score;
         
-        // Profesyonel Dokunuş: Her 5 puanda bir zorluğu artır
-        if (score > 0 && score % 5 == 0)
+        // Yüksek puanı kontrol et ve kaydet
+        if (score > PlayerPrefs.GetInt("HighScore", 0))
         {
-            spawner.IncreaseDifficulty(0.2f);
+            PlayerPrefs.SetInt("HighScore", score);
+            PlayerPrefs.Save(); // Veriyi diske yaz
+            Debug.Log("Yeni Rekor: " + score);
         }
     }
 
